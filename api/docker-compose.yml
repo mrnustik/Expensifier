@@ -1,0 +1,6 @@
+﻿services:
+  expensifier.api:
+    image: expensifier.api
+    build:
+      context: .
+      dockerfile: Expensifier.API/Dockerfile

@@ -1,5 +1,5 @@
 ﻿using MediatR;
 
-namespace Expensifier.Common.Queries;
+namespace Expensifier.API.Common.Queries;
 
 public abstract record Query<TOutput> : IRequest<TOutput>;

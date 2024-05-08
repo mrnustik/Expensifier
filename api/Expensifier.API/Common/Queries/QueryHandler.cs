@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Expensifier.Common.Queries;
+namespace Expensifier.API.Common.Queries;
 
 public abstract class QueryHandler<TQuery, TOutput> : IRequestHandler<TQuery, TOutput> 
     where TQuery : Query<TOutput>

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Expensifier.Common.Commands;
+namespace Expensifier.API.Common.Commands;
 
 public abstract class CommandHandler<TCommand, TOutput> : IRequestHandler<TCommand, TOutput>
     where TCommand : Command<TOutput>
