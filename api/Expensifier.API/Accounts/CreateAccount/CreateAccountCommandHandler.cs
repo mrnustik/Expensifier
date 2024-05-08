@@ -17,7 +17,7 @@ public class CreateAccountCommandHandler : CommandHandler<CreateAccountCommand, 
     {
         var accountId = AccountId.New();
 
-        var createdEvent = new AccountCreated(accountId, command.Name, command.InitialBalance);
+        var createdEvent = new AccountCreated(accountId, command.Name);
         _documentSession.Events.Append(accountId.Value,
                                        createdEvent);
         await _documentSession.SaveChangesAsync(cancellationToken);
