@@ -1,6 +1,6 @@
-﻿using Expensifier.API.Accounts.Create;
+﻿using Expensifier.API.Accounts.CreateAccount;
 using Expensifier.API.Accounts.Domain;
-using Expensifier.API.Accounts.GetById;
+using Expensifier.API.Accounts.GetAccountsById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

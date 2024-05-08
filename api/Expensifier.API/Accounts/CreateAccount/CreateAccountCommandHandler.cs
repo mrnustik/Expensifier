@@ -2,7 +2,7 @@
 using Expensifier.API.Common.Commands;
 using Marten;
 
-namespace Expensifier.API.Accounts.Create;
+namespace Expensifier.API.Accounts.CreateAccount;
 
 public class CreateAccountCommandHandler : CommandHandler<CreateAccountCommand, AccountId>
 {

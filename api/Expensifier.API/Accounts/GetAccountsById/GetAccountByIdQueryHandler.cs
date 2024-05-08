@@ -2,7 +2,7 @@ using Expensifier.API.Accounts.Domain;
 using Expensifier.API.Common.Queries;
 using Marten;
 
-namespace Expensifier.API.Accounts.GetById;
+namespace Expensifier.API.Accounts.GetAccountsById;
 
 public class GetAccountByIdQueryHandler : QueryHandler<GetAccountByIdQuery, Account>
 {
@@ -15,7 +15,9 @@ public class GetAccountByIdQueryHandler : QueryHandler<GetAccountByIdQuery, Acco
 
     protected override async Task<Account> Query(GetAccountByIdQuery query, CancellationToken cancellationToken)
     {
-        var account = await _documentSession.Events.AggregateStreamAsync<Account>(query.AccountId.Value, token: cancellationToken);
+        var account =
+            await _documentSession.Events.AggregateStreamAsync<Account>(
+                query.AccountId.Value, token: cancellationToken);
         return account!;
     }
 }
