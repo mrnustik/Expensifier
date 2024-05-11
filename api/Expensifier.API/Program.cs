@@ -1,4 +1,5 @@
 using Expensifier.API.Accounts;
+using Expensifier.API.Common.Users;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Weasel.Core;
@@ -8,8 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediatR(options => { options.RegisterServicesFromAssemblyContaining<Program>(); });
+builder.Services.AddScoped<IUserProvider, FakeUserProvider>();
 
+builder.Services.AddMediatR(options => { options.RegisterServicesFromAssemblyContaining<Program>(); });
 builder.Services.AddMarten(options =>
        {
            var connectionString = builder.Configuration.GetConnectionString("Postgres");

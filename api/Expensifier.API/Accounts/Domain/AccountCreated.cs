@@ -1,5 +1,8 @@
-﻿namespace Expensifier.API.Accounts.Domain;
+﻿using Expensifier.API.Common.Users;
+
+namespace Expensifier.API.Accounts.Domain;
 
 public record AccountCreated(
     AccountId Id,
-    string Name);
+    string Name,
+    UserId UserId);

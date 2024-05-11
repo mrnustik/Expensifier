@@ -5,9 +5,9 @@ using Marten;
 namespace Expensifier.API.Accounts.GetAccountsById;
 
 public record GetAccountByIdQuery(AccountId AccountId)
-    : Query<AccountListInformation?>
+    : Query<AccountDetail?>
 {
-    public class Handler : QueryHandler<GetAccountByIdQuery, AccountListInformation?>
+    public class Handler : QueryHandler<GetAccountByIdQuery, AccountDetail?>
     {
         private readonly IDocumentSession _documentSession;
 
@@ -16,10 +16,10 @@ public record GetAccountByIdQuery(AccountId AccountId)
             _documentSession = documentSession;
         }
 
-        protected override async Task<AccountListInformation?> Query(GetAccountByIdQuery query,
-                                                                     CancellationToken cancellationToken)
+        protected override async Task<AccountDetail?> Query(GetAccountByIdQuery query,
+                                                            CancellationToken cancellationToken)
         {
-            return await _documentSession.Query<AccountListInformation>()
+            return await _documentSession.Query<AccountDetail>()
                                          .SingleOrDefaultAsync(a => a.Id == query.AccountId.Value, cancellationToken);
         }
     }

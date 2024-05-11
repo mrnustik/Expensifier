@@ -1,24 +1,27 @@
 ﻿using Expensifier.API.Accounts.Domain;
+using Expensifier.API.Common.Users;
 using Marten.Events.Aggregation;
 
 namespace Expensifier.API.Accounts.GetAccountsById;
 
-public class AccountListInformation
+public class AccountDetail
 {
     public Guid Id { get; set; }
     public AccountId AccountId { get; set; }
     public string Name { get; set; }
+    public UserId UserId { get; set; }
     public decimal Balance { get; set; }
 
-    public void Apply(AccountCreated accountCreated)
+    private void Apply(AccountCreated @event)
     {
-        Id = accountCreated.Id.Value;
-        AccountId = accountCreated.Id;
-        Name = accountCreated.Name;
+        Id = @event.Id.Value;
+        AccountId = @event.Id;
+        Name = @event.Name;
+        UserId = @event.UserId;
         Balance = 0;
     }
 
-    public class ProjectionConfiguration : SingleStreamProjection<AccountListInformation>
+    public class ProjectionConfiguration : SingleStreamProjection<AccountDetail>
     {
         public ProjectionConfiguration()
         {

@@ -1,11 +1,13 @@
 ﻿using Expensifier.API.Accounts.Domain;
 using Expensifier.API.Common.Commands;
+using Expensifier.API.Common.Users;
 using Marten;
 
 namespace Expensifier.API.Accounts.CreateAccount;
 
 public record CreateAccountCommand(
-    string Name)
+    string Name,
+    UserId UserId)
     : Command<AccountId>
 {
     public class Handler : CommandHandler<CreateAccountCommand, AccountId>
@@ -22,7 +24,7 @@ public record CreateAccountCommand(
         {
             var accountId = AccountId.New();
 
-            var createdEvent = new AccountCreated(accountId, command.Name);
+            var createdEvent = new AccountCreated(accountId, command.Name, command.UserId);
             _documentSession.Events.Append(accountId.Value,
                                            createdEvent);
             await _documentSession.SaveChangesAsync(cancellationToken);
