@@ -6,17 +6,18 @@ using Marten;
 namespace Expensifier.API.Accounts.CreateAccount;
 
 public record CreateAccountCommand(
-    string Name,
-    UserId UserId)
+    string Name)
     : Command<AccountId>
 {
     public class Handler : CommandHandler<CreateAccountCommand, AccountId>
     {
         private readonly IDocumentSession _documentSession;
+        private readonly IUserProvider _userProvider;
 
-        public Handler(IDocumentSession documentSession)
+        public Handler(IDocumentSession documentSession, IUserProvider userProvider)
         {
             _documentSession = documentSession;
+            _userProvider = userProvider;
         }
 
         protected override async Task<AccountId> Execute(CreateAccountCommand command,
@@ -24,7 +25,7 @@ public record CreateAccountCommand(
         {
             var accountId = AccountId.New();
 
-            var createdEvent = new AccountCreated(accountId, command.Name, command.UserId);
+            var createdEvent = new AccountCreated(accountId, command.Name, _userProvider.CurrentUserId);
             _documentSession.Events.Append(accountId.Value,
                                            createdEvent);
             await _documentSession.SaveChangesAsync(cancellationToken);
