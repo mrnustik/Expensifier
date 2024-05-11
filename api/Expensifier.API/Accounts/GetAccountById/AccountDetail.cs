@@ -2,7 +2,7 @@
 using Expensifier.API.Common.Users;
 using Marten.Events.Aggregation;
 
-namespace Expensifier.API.Accounts.GetAccountsById;
+namespace Expensifier.API.Accounts.GetAccountById;
 
 public class AccountDetail
 {

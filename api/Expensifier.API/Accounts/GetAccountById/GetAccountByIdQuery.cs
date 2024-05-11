@@ -2,7 +2,7 @@ using Expensifier.API.Accounts.Domain;
 using Expensifier.API.Common.Queries;
 using Marten;
 
-namespace Expensifier.API.Accounts.GetAccountsById;
+namespace Expensifier.API.Accounts.GetAccountById;
 
 public record GetAccountByIdQuery(AccountId AccountId)
     : Query<AccountDetail?>

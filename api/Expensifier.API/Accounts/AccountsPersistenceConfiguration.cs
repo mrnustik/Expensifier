@@ -1,4 +1,4 @@
-﻿using Expensifier.API.Accounts.GetAccountsById;
+﻿using Expensifier.API.Accounts.GetAccountById;
 using Marten;
 using Marten.Events.Projections;
 
