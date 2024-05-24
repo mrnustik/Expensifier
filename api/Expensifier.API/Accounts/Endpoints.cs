@@ -1,6 +1,8 @@
 ﻿using Expensifier.API.Accounts.CreateAccount;
 using Expensifier.API.Accounts.Domain;
 using Expensifier.API.Accounts.GetAccountById;
+using Expensifier.API.Accounts.GetAccounts;
+using Expensifier.API.Common.Users;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +18,7 @@ public static class Endpoints
                            CancellationToken cancellationToken) =>
                     {
                         var accountId = await mediator.Send(command, cancellationToken);
-                        return TypedResults.Created($"accounts/{accountId}");
+                        return TypedResults.Created($"accounts/{accountId}", accountId);
                     });
 
         app.MapGet("accounts/{id}",
@@ -26,6 +28,16 @@ public static class Endpoints
                    {
                        var account = await mediator.Send(new GetAccountByIdQuery(id), cancellationToken);
                        return TypedResults.Ok(account);
+                   });
+
+        app.MapGet("accounts",
+                   async (IMediator mediator,
+                          IUserProvider userProvider,
+                          CancellationToken cancellationToken) =>
+                   {
+                       var accounts =
+                           await mediator.Send(new GetAllAccountsQuery(userProvider.CurrentUserId), cancellationToken);
+                       return TypedResults.Ok(accounts);
                    });
     }
 }
