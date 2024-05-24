@@ -21,7 +21,7 @@ public record GetAllAccountsQuery(UserId UserId)
             CancellationToken cancellationToken)
         {
             return await _documentSession.Query<AccountListItem>()
-                                         .Where(i => i.UserId == query.UserId)
+                                         .Where(i => i.UserId == query.UserId.Value)
                                          .ToListAsync(cancellationToken);
         }
     }
