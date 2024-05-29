@@ -9,6 +9,7 @@ import '@fontsource/roboto/700.css';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline, createTheme } from '@mui/material';
 import { Root } from './Root';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,8 +17,8 @@ const router = createBrowserRouter(
       path='/'
       element={<Root />}
     >
-      <Route index element={<AccountList/ >}/>
-      <Route path='/accounts' element={<AccountList/>} />
+      <Route index element={<AccountList />} />
+      <Route path='/accounts' element={<AccountList />} />
     </Route>
   ));
 
@@ -27,14 +28,19 @@ const darkTheme = createTheme({
   },
 });
 
+const queryClient = new QueryClient();
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
