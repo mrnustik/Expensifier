@@ -1,29 +1,42 @@
+import { Fab } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
+import { useNavigate } from 'react-router';
 
 async function getAccountsList() {
     const response = await fetch('/api/accounts');
     return response.json();
 }
 
+
 export const AccountList: React.FC = () => {
-    const {data, error, isLoading} = useQuery({
+    const navigate = useNavigate();
+    const { data, error, isLoading } = useQuery({
         queryKey: ['accounts'],
         queryFn: getAccountsList
     })
 
-    if(isLoading) {
+    if (isLoading) {
         return <h1>Loading</h1>
     }
 
-    if(error) {
+    if (error) {
         return <h1>Error...</h1>
     }
+
+    const onCreateClick = () => {
+        navigate("/accounts/create")
+    };
 
     return <>
         <h1>Account List</h1>
         <ul>
             {data.map((account: any) => <li key={account.id}>{account.name}</li>)}
         </ul>
+        <Fab style={{position:'fixed', bottom: 40, right: 40}}
+             onClick={onCreateClick}>
+            <Add />
+        </Fab>
     </>;
 };

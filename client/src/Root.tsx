@@ -19,7 +19,7 @@ export const Root: React.FC = () => {
                         overflow: 'auto',
                     }}>
                     <Toolbar />
-                    <Container sx={{ mt: 4, mb: 4 }}>
+                    <Container sx={{ mt: 4, mb: 4, height: '100vh' }}>
                         <Outlet />
                     </Container>
                 </Box>

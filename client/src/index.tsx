@@ -10,6 +10,7 @@ import { ThemeProvider } from '@emotion/react';
 import { CssBaseline, createTheme } from '@mui/material';
 import { Root } from './Root';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AccountCreate } from './Accounts/AccountCreate';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
     >
       <Route index element={<AccountList />} />
       <Route path='/accounts' element={<AccountList />} />
+      <Route path='/accounts/create' element={<AccountCreate/>} />
     </Route>
   ));
 
