@@ -1,30 +1,40 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import { AccountList } from './Accounts/AccountsList';
-import { ErrorPage } from './ErrorPage/ErrorPage';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import { ThemeProvider } from '@emotion/react';
+import { CssBaseline, createTheme } from '@mui/material';
+import { Root } from './Root';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <AccountList />,
-    errorElement: <ErrorPage />
-  }
-])
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route
+      path='/'
+      element={<Root />}
+    >
+      <Route index element={<AccountList/ >}/>
+      <Route path='/accounts' element={<AccountList/>} />
+    </Route>
+  ));
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <RouterProvider router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
