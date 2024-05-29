@@ -12,7 +12,7 @@ public static class Endpoints
 {
     public static void AddAccountEndpoints(this WebApplication app)
     {
-        app.MapPost("accounts/create",
+        app.MapPost("api/accounts/create",
                     async ([FromBody] CreateAccountCommand command,
                            IMediator mediator,
                            CancellationToken cancellationToken) =>
@@ -21,7 +21,7 @@ public static class Endpoints
                         return TypedResults.Created($"accounts/{accountId}", accountId);
                     });
 
-        app.MapGet("accounts/{id}",
+        app.MapGet("api/accounts/{id}",
                    async ([FromRoute] AccountId id,
                           IMediator mediator,
                           CancellationToken cancellationToken) =>
@@ -30,7 +30,7 @@ public static class Endpoints
                        return TypedResults.Ok(account);
                    });
 
-        app.MapGet("accounts",
+        app.MapGet("api/accounts",
                    async (IMediator mediator,
                           IUserProvider userProvider,
                           CancellationToken cancellationToken) =>
