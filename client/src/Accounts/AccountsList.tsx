@@ -3,18 +3,15 @@ import { Add } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useNavigate } from 'react-router';
-
-async function getAccountsList() {
-    const response = await fetch('/api/accounts');
-    return response.json();
-}
-
+import { IAccountListItem } from './API/IAccountListItem';
+import { AccountListItemCard } from './Components/AccountListItemCard';
+import { loadAccounts } from './API/loadAccounts';
 
 export const AccountList: React.FC = () => {
     const navigate = useNavigate();
     const { data, error, isLoading } = useQuery({
         queryKey: ['accounts'],
-        queryFn: getAccountsList
+        queryFn: loadAccounts
     })
 
     if (isLoading) {
@@ -31,9 +28,9 @@ export const AccountList: React.FC = () => {
 
     return <>
         <h1>Account List</h1>
-        <ul>
-            {data.map((account: any) => <li key={account.id}>{account.name}</li>)}
-        </ul>
+        { data?.map((account: IAccountListItem) => 
+            <AccountListItemCard key={account.id} item={account}/>)
+        }
         <Fab style={{position:'fixed', bottom: 40, right: 40}}
              onClick={onCreateClick}>
             <Add />
