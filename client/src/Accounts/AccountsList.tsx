@@ -3,9 +3,8 @@ import { Add } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { IAccountListItem } from './API/IAccountListItem';
 import { AccountListItemCard } from './Components/AccountListItemCard';
-import { loadAccounts } from './API/loadAccounts';
+import { IAccountListItem, loadAccounts } from './API/loadAccounts';
 
 export const AccountList: React.FC = () => {
     const navigate = useNavigate();

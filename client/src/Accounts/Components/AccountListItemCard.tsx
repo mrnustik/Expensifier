@@ -1,5 +1,5 @@
 import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
-import { IAccountListItem } from "../API/IAccountListItem"
+import { IAccountListItem } from "../API/loadAccounts";
 
 
 interface Props {
