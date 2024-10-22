@@ -18,7 +18,7 @@ public static class Endpoints
                            CancellationToken cancellationToken) =>
                     {
                         var accountId = await mediator.Send(command, cancellationToken);
-                        return TypedResults.Created($"accounts/{accountId}", accountId);
+                        return TypedResults.Created($"api/accounts/{accountId}", accountId);
                     });
 
         app.MapGet("api/accounts/{id}",

@@ -37,7 +37,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
 
         // Act
         var response = await httpClient.PostAsync(
-            "accounts/create",
+            "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
 
 
@@ -61,7 +61,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
             builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
         var httpClient = webApplicationFactory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
-            "accounts/create",
+            "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
         createdResponse.EnsureSuccessStatusCode();
         var location = createdResponse
@@ -92,14 +92,14 @@ public class AccountsIntegrationTests : IAsyncLifetime
             builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
         var httpClient = webApplicationFactory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
-            "accounts/create",
+            "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
         createdResponse.EnsureSuccessStatusCode();
         var accountId = await createdResponse.Content
                                              .ReadFromJsonAsync<AccountId>();
 
         // Act
-        var getByIdResponse = await httpClient.GetAsync($"accounts/{accountId}");
+        var getByIdResponse = await httpClient.GetAsync($"api/accounts/{accountId}");
 
         // Assert
         getByIdResponse.EnsureSuccessStatusCode();
@@ -125,14 +125,14 @@ public class AccountsIntegrationTests : IAsyncLifetime
             builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
         var httpClient = webApplicationFactory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
-            "accounts/create",
+            "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
         createdResponse.EnsureSuccessStatusCode();
         var accountId = await createdResponse.Content
                                              .ReadFromJsonAsync<AccountId>();
 
         // Act
-        var getByIdResponse = await httpClient.GetAsync($"accounts");
+        var getByIdResponse = await httpClient.GetAsync("api/accounts");
 
         // Assert
         getByIdResponse.EnsureSuccessStatusCode();
