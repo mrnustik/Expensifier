@@ -2,6 +2,7 @@ using Expensifier.API.Accounts;
 using Expensifier.API.Common.Users;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,14 +33,21 @@ builder.Services.AddMarten(options =>
        })
        .AddAsyncDaemon(DaemonMode.Solo);
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger();    app.UseSwaggerUI();
 }
 
 app.AddAccountEndpoints();
+
+app.MapHealthChecks("/health/full");
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false
+});
 
 app.Run();
