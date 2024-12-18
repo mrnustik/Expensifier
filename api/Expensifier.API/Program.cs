@@ -33,7 +33,9 @@ builder.Services.AddMarten(options =>
        })
        .AddAsyncDaemon(DaemonMode.Solo);
 
-builder.Services.AddHealthChecks();
+builder.Services
+       .AddHealthChecks()
+       .AddNpgSql(builder.Configuration.GetConnectionString("Postgres") ?? throw new InvalidOperationException());
 
 var app = builder.Build();
 
