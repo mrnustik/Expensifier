@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expensifier-api
+  labels:
+    app: expensifier-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: expensifier-api
+  template:
+    metadata:
+      labels:
+        app: expensifier-api
+    spec:
+      containers:
+        - name: expensifier-api
+          image: mrnustik/expensifier-api:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: expensifier-api-secret
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /api/health/full
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /api/health/live
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expensifier-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: expensifier-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      appProtocol: http

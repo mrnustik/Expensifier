@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expensifier-client
+  labels:
+    app: expensifier-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expensifier-client
+  template:
+    metadata:
+      labels:
+        app: expensifier-client
+    spec:
+      containers:
+        - name: expensifier-client
+          image: mrnustik/expensifier-client:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: expensifier-client-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: expensifier-client
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      appProtocol: http
+
