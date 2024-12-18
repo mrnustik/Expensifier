@@ -44,8 +44,8 @@ if (app.Environment.IsDevelopment())
 
 app.AddAccountEndpoints();
 
-app.MapHealthChecks("/health/full");
-app.MapHealthChecks("/health/live", new HealthCheckOptions
+app.MapHealthChecks("/api/health/full");
+app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 {
     Predicate = _ => false
 });
