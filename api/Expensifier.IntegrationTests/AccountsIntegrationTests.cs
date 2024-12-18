@@ -6,34 +6,30 @@ using Expensifier.API.Accounts.GetAccountById;
 using Expensifier.API.Accounts.GetAccounts;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 
 namespace Expensifier.IntegrationTests;
 
 public class AccountsIntegrationTests : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-                                                     .WithImage("postgres:latest")
-                                                     .Build();
+    private readonly CustomWebApplicationFactory _factory = new();
 
     public Task InitializeAsync()
     {
-        return _postgres.StartAsync();
+        return _factory.StartAsync();
     }
 
     public Task DisposeAsync()
     {
-        return _postgres.DisposeAsync().AsTask();
+        return _factory.DisposeAsync().AsTask();
     }
 
     [Fact]
     public async Task CreateAccount_WithValidValues_ReturnsOK()
     {
         // Arrange 
-        var webApplicationFactory = new WebApplicationFactory<Program>();
-        webApplicationFactory.WithWebHostBuilder(
-            builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
-        var httpClient = webApplicationFactory.CreateClient();
+        var httpClient = _factory.CreateClient();
 
         // Act
         var response = await httpClient.PostAsync(
@@ -56,10 +52,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
     public async Task GetAccountById_WithCreateAccountLocation_ReturnsOK()
     {
         // Arrange 
-        var webApplicationFactory = new WebApplicationFactory<Program>();
-        webApplicationFactory.WithWebHostBuilder(
-            builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
-        var httpClient = webApplicationFactory.CreateClient();
+        var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
@@ -87,10 +80,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
     public async Task GetAccountById_WithCreateAccountId_ReturnsOK()
     {
         // Arrange 
-        var webApplicationFactory = new WebApplicationFactory<Program>();
-        webApplicationFactory.WithWebHostBuilder(
-            builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
-        var httpClient = webApplicationFactory.CreateClient();
+        var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
@@ -120,10 +110,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
     public async Task GetAllAccounts_WithExistingAccount_ReturnsOK()
     {
         // Arrange 
-        var webApplicationFactory = new WebApplicationFactory<Program>();
-        webApplicationFactory.WithWebHostBuilder(
-            builder => { builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString()); });
-        var httpClient = webApplicationFactory.CreateClient();
+        var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
             JsonContent.Create(new CreateAccountCommand("Account")));
