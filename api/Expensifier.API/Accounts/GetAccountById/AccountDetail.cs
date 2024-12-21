@@ -23,6 +23,7 @@ public class AccountDetail
         public ProjectionConfiguration()
         {
             ProjectEvent<AccountCreated>((i, e) => i.Apply(e));
+            DeleteEvent<AccountDeleted>();
         }
     }
 }

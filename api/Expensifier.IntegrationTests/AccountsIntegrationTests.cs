@@ -133,4 +133,52 @@ public class AccountsIntegrationTests : IAsyncLifetime
                                a.Name == "Account" &&
                                a.Id == accountId.Value);
     }
+
+    [Fact]
+    public async Task DeleteAccount_WithExistingAccount_ReturnsOK()
+    {
+        // Arrange
+        var httpClient = _factory.CreateClient();
+        var createdResponse = await httpClient.PostAsync(
+            "api/accounts/create",
+            JsonContent.Create(new CreateAccountCommand("Account")));
+        createdResponse.EnsureSuccessStatusCode();
+        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>();
+        
+        // Act
+        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}");
+        
+        // Assert
+        deleteResponse.EnsureSuccessStatusCode();
+        deleteResponse.StatusCode
+                      .Should()
+                      .Be(HttpStatusCode.NoContent);
+    }
+    
+    
+    [Fact]
+    public async Task DeleteAccount_ShouldRemoveItFromAccountList()
+    {
+        // Arrange
+        var httpClient = _factory.CreateClient();
+        var createdResponse = await httpClient.PostAsync(
+            "api/accounts/create",
+            JsonContent.Create(new CreateAccountCommand("Account")));
+        createdResponse.EnsureSuccessStatusCode();
+        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>();
+        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}");
+        deleteResponse.EnsureSuccessStatusCode();
+
+        // Act
+        var accounts = await httpClient.GetAsync("api/accounts");
+        
+        // Assert
+        accounts.EnsureSuccessStatusCode();
+        accounts.StatusCode
+                .Should()
+                .Be(HttpStatusCode.OK);
+        var body = await accounts.Content.ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>();
+        body.Should()
+            .NotContain(a => a.Id == accountId.Value);
+    }
 }

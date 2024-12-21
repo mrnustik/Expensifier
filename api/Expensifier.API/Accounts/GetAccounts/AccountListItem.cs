@@ -21,6 +21,7 @@ public record AccountListItem
         public ProjectionConfiguration()
         {
             ProjectEvent<AccountCreated>((a, e) => a.Apply(e));
+            DeleteEvent<AccountDeleted>();
         }
     }
 }

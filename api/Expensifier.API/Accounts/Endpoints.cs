@@ -1,4 +1,5 @@
 ﻿using Expensifier.API.Accounts.CreateAccount;
+using Expensifier.API.Accounts.DeleteAccount;
 using Expensifier.API.Accounts.Domain;
 using Expensifier.API.Accounts.GetAccountById;
 using Expensifier.API.Accounts.GetAccounts;
@@ -39,5 +40,14 @@ public static class Endpoints
                            await mediator.Send(new GetAllAccountsQuery(userProvider.CurrentUserId), cancellationToken);
                        return TypedResults.Ok(accounts);
                    });
+
+        app.MapDelete("api/accounts/{id}",
+                      async ([FromRoute] AccountId id,
+                             IMediator mediator,
+                             CancellationToken cancellationToken) =>
+                      {
+                            await mediator.Send(new DeleteAccountCommand(id), cancellationToken);
+                            return TypedResults.NoContent();
+                      });
     }
 }
