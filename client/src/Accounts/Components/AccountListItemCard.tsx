@@ -1,5 +1,5 @@
-import {Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography} from "@mui/material";
-import { IAccountListItem } from "../API/loadAccounts";
+import {Button, Card, CardActions, CardHeader, IconButton} from "@mui/material";
+import {IAccountListItem} from "../API/loadAccounts";
 import React from "react";
 import {Delete} from "@mui/icons-material";
 
