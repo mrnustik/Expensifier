@@ -1,4 +1,4 @@
-﻿export async function deleteAccount(id: string) {
+export async function deleteAccount(id: string) {
     const response = await fetch(`/api/accounts/${id}`, {
         method: "DELETE",
         headers: {
