@@ -36,7 +36,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-
+      - name: Echo version
+        run: |
+          echo Pushing mrnustik/expensifier-api:${{ vars.VERSION }}.${{ github.run_number }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -56,6 +58,11 @@ jobs:
           file: ./api/Expensifier.API/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: mrnustik/expensifier-api:latest
+          tags: mrnustik/expensifier-api:${{ vars.VERSION }}.${{ github.run_number }}
           provenance: true
           sbom: true
+      - name: Create git tag
+        run: |
+          git tag api-v${{ vars.VERSION }}.${{ github.run_number }}
+      - name: Push git tag
+        run: git push origin ${{ vars.VERSION }}.${{ github.run_number }}
