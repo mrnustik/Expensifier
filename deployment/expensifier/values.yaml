@@ -1,6 +1,6 @@
 backend:
   version: v0.1.32
 client:
-  version: v0.1.24
+  version: v0.1.25
 cloudflare:
   domain: expensifier.mrnustik.net
