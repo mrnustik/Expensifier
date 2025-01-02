@@ -1,0 +1,8 @@
+backend:
+  version: 'latest'
+
+client:
+  version: 'latest'
+
+cloudflare:
+  domain: 'expensifier.mrnustik.net'
