@@ -7,6 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: [ "api/**" ]
+  workflow_dispatch:
+    
 
 jobs:
   build:
@@ -58,7 +60,7 @@ jobs:
           file: ./api/Expensifier.API/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: mrnustik/expensifier-api:${{ vars.VERSION }}.${{ github.run_number }}
+          tags: mrnustik/expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}
           provenance: true
           sbom: true
       - name: Create git tag
@@ -66,3 +68,16 @@ jobs:
           git tag api-v${{ vars.VERSION }}.${{ github.run_number }}
       - name: Push git tag
         run: git push origin api-v${{ vars.VERSION }}.${{ github.run_number }}
+      - name: Update infrastructure files
+        uses: loveholidays/gitops-action-yaml-updater@v1.0
+        with:
+          mode: IMAGE_TAG
+          container-name: expensifier-api
+          new-image-tag: v${{ vars.VERSION }}.${{ github.run_number }}
+          files: infrastructure/api-deployment.yaml
+      - name: Git commit
+        run: |
+          git commit -m "Release expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}"
+      - name: Git push
+        run: |
+          git push origin main
