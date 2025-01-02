@@ -37,6 +37,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: expensifier-api-service
+  labels:
+    app: expensifier-api
 spec:
   type: LoadBalancer
   selector:
@@ -46,6 +48,7 @@ spec:
       targetPort: 8080
       protocol: TCP
       appProtocol: http
+      name: web
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
@@ -59,3 +62,16 @@ spec:
       app: expensifier-api
   podMetricsEndpoints:
   - portNumber: 8080
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: expensifier-api
+  labels:
+    app: expensifier-api
+spec:
+  selector:
+    matchLabels:
+      app: expensifier-api
+  endpoints:
+  - port: web
