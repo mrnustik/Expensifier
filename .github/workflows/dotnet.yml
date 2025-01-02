@@ -7,6 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: [ "api/**" ]
+  workflow_dispatch:
+    
 
 jobs:
   build:
@@ -36,7 +38,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-
+      - name: Echo version
+        run: |
+          echo Pushing mrnustik/expensifier-api:${{ vars.VERSION }}.${{ github.run_number }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -56,6 +60,25 @@ jobs:
           file: ./api/Expensifier.API/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: mrnustik/expensifier-api:latest
+          tags: mrnustik/expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}
           provenance: true
           sbom: true
+      - name: Create git tag
+        run: |
+          git tag api-v${{ vars.VERSION }}.${{ github.run_number }}
+      - name: Push git tag
+        run: git push origin api-v${{ vars.VERSION }}.${{ github.run_number }}
+      - name: Update infrastructure files
+        uses: loveholidays/gitops-action-yaml-updater@v1.0
+        with:
+          mode: IMAGE_TAG
+          container-name: expensifier-api
+          new-image-tag: v${{ vars.VERSION }}.${{ github.run_number }}
+          dir: infrastructure
+          files: api-deployment.yaml
+      - name: Git commit
+        run: |
+          git commit -m "Release expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}"
+      - name: Git push
+        run: |
+          git push origin main
