@@ -74,7 +74,8 @@ jobs:
           mode: IMAGE_TAG
           container-name: expensifier-api
           new-image-tag: v${{ vars.VERSION }}.${{ github.run_number }}
-          files: infrastructure/api-deployment.yaml
+          dir: infrastructure
+          files: api-deployment.yaml
       - name: Git commit
         run: |
           git commit -m "Release expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}"
