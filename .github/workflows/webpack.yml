@@ -1,4 +1,4 @@
-name: NodeJS with Webpack
+name: Client build
 
 on:
   push:
@@ -7,6 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: [ "client/**" ]
+  workflow_dispatch:
+
 
 jobs:
   build:
@@ -37,10 +39,6 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
     
     steps:
     - uses: actions/checkout@v4
@@ -70,3 +68,12 @@ jobs:
         git tag client-v${{ vars.VERSION }}.${{ github.run_number }}
     - name: Push git tag
       run: git push origin client-v${{ vars.VERSION }}.${{ github.run_number }}
+    - name: Update api version
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        valueFile: 'deployment/expensifier/values.yaml'
+        propertyPath: 'client.version'
+        value: v${{ vars.VERSION }}.${{ github.run_number }}
+        commitChange: true
+        branch: 'main'
+        message: "Release client v${{ vars.VERSION }}.${{ github.run_number }}"

@@ -1,4 +1,4 @@
-name: .NET
+name: API build
 
 on:
   push:
@@ -68,17 +68,12 @@ jobs:
           git tag api-v${{ vars.VERSION }}.${{ github.run_number }}
       - name: Push git tag
         run: git push origin api-v${{ vars.VERSION }}.${{ github.run_number }}
-      - name: Update infrastructure files
-        uses: loveholidays/gitops-action-yaml-updater@v1.0
+      - name: Update api version
+        uses: fjogeleit/yaml-update-action@main
         with:
-          mode: IMAGE_TAG
-          container-name: expensifier-api
-          new-image-tag: v${{ vars.VERSION }}.${{ github.run_number }}
-          dir: infrastructure
-          files: api-deployment.yaml
-      - name: Git commit
-        run: |
-          git commit -m "Release expensifier-api:v${{ vars.VERSION }}.${{ github.run_number }}"
-      - name: Git push
-        run: |
-          git push origin main
+          valueFile: 'deployment/expensifier/values.yaml'
+          propertyPath: 'backend.version'
+          value: v${{ vars.VERSION }}.${{ github.run_number }}
+          commitChange: true
+          branch: 'main'
+          message: "Release api v${{ vars.VERSION }}.${{ github.run_number }}"
