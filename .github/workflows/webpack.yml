@@ -7,6 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
     paths: [ "client/**" ]
+  workflow_dispatch:
+
 
 jobs:
   build:
@@ -70,3 +72,12 @@ jobs:
         git tag client-v${{ vars.VERSION }}.${{ github.run_number }}
     - name: Push git tag
       run: git push origin client-v${{ vars.VERSION }}.${{ github.run_number }}
+    - name: Update api version
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        valueFile: 'deployment/expensifier/values.yaml'
+        propertyPath: 'client.version'
+        value: v${{ vars.VERSION }}.${{ github.run_number }}
+        commitChange: true
+        branch: 'main'
+        message: "Release client v${{ vars.VERSION }}.${{ github.run_number }}"
