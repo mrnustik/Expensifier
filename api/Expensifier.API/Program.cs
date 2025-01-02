@@ -3,6 +3,7 @@ using Expensifier.API.Common.Users;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Prometheus;
 using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,9 @@ builder.Services.AddMarten(options =>
 builder.Services
        .AddHealthChecks()
        .AddNpgSql(builder.Configuration.GetConnectionString("Postgres") ?? throw new InvalidOperationException());
+builder.Services
+       .UseHttpClientMetrics();
+
 
 var app = builder.Build();
 
@@ -46,7 +50,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.AddAccountEndpoints();
-
+app.UseMetricServer();
+app.UseHttpMetrics();
 app.MapHealthChecks("/api/health/full");
 app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 {
