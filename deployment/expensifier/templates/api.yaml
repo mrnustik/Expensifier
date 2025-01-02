@@ -13,7 +13,6 @@ spec:
   template:
     metadata:
       labels:
-        app: expensifier-api
     spec:
       containers:
         - name: expensifier-api
@@ -58,4 +57,4 @@ spec:
     matchLabels:
       app: expensifier-api
   podMetricsEndpoints:
-  - port: 8080
+  - portNumber: 8080
