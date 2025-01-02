@@ -76,3 +76,4 @@ jobs:
           value: v${{ vars.VERSION }}.${{ github.run_number }}
           commitChange: true
           branch: 'main'
+          message: "Release api v${{ vars.VERSION }}.${{ github.run_number }}"
