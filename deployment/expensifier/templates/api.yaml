@@ -58,4 +58,4 @@ spec:
     matchLabels:
       app: expensifier-api
   podMetricsEndpoints:
-  - port: 8080
+  - portNumber: 8080
