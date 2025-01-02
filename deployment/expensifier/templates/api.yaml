@@ -27,7 +27,7 @@ spec:
           readinessProbe:
             httpGet:
               port: 8080
-              path: /api/health/full?date=2024-12-21
+              path: /api/health/full
           livenessProbe:
             httpGet:
               port: 8080
