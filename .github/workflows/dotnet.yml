@@ -71,7 +71,7 @@ jobs:
       - name: Update api version
         uses: fjogeleit/yaml-update-action@main
         with:
-          valueFile: 'deployments/expensifier/values.yaml'
+          valueFile: 'deployment/expensifier/values.yaml'
           propertyPath: 'backend.version'
           value: v${{ vars.VERSION }}.${{ github.run_number }}
           commitChange: true
