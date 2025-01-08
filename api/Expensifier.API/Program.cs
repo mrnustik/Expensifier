@@ -1,5 +1,6 @@
 using Expensifier.API.Accounts;
 using Expensifier.API.Common.Users;
+using Loki.Extensions.Logging;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -7,6 +8,17 @@ using Prometheus;
 using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsProduction())
+{
+    builder.Logging.AddLoki(options =>
+    {
+        options.IncludeScopes = true;
+        options.IncludePredefinedFields = true;
+        options.ApplicationName = "Expensifier";
+        options.MachineName = Environment.MachineName;
+    });
+}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -57,5 +69,9 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 {
     Predicate = _ => false
 });
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+logger.LogCritical("Penis");
 
 app.Run();
