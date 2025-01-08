@@ -1,5 +1,6 @@
 using Expensifier.API.Accounts;
 using Expensifier.API.Common.Users;
+using Loki.Extensions.Logging;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -7,6 +8,15 @@ using Prometheus;
 using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsProduction())
+{
+    builder.Logging.AddLoki(options =>
+    {
+        options.IncludeScopes = true;
+        options.IncludePredefinedFields = true;
+    });
+}
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
