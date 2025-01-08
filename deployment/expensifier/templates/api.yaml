@@ -75,16 +75,3 @@ spec:
       app: expensifier-api
   endpoints:
   - port: web
----
-apiVersion: monitoring.coreos.com/v1
-kind: Prometheus
-metadata:
-  name: prometheus
-spec:
-  serviceAccountName: prometheus
-  serviceMonitorSelector:
-    matchLabels:
-      app: expensifier-api
-  podMonitorSelector:
-    matchLabels:
-      app: expensifier-api
