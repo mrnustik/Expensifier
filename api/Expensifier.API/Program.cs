@@ -2,7 +2,9 @@ using Expensifier.API.Accounts;
 using Expensifier.API.Common.Users;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
+using Marten.Services;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Npgsql;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -24,9 +26,13 @@ if (tracingOtlpEndpoint != null)
                                          m.AddAspNetCoreInstrumentation()
                                           .AddRuntimeInstrumentation()
                                           .AddProcessInstrumentation()
+                                          .AddNpgsqlInstrumentation()
+                                          .AddMeter("Marten")
                                           .AddMeter("*")
                                           .AddPrometheusExporter());
     openTelemetryBuilder.WithTracing(t => t.AddAspNetCoreInstrumentation()
+                                           .AddNpgsql()
+                                           .AddSource("Marten")
                                            .AddOtlpExporter(e =>
                                            {
                                                e.Protocol = OtlpExportProtocol.Grpc;
@@ -64,6 +70,8 @@ builder.Services.AddMarten(options =>
                options.AutoCreateSchemaObjects = AutoCreate.All;
            }
 
+           options.OpenTelemetry.TrackConnections = TrackLevel.Verbose;
+           options.OpenTelemetry.TrackEventCounters();
            options.ConfigureAccounts();
        })
        .AddAsyncDaemon(DaemonMode.Solo);
@@ -94,6 +102,6 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
-logger.LogCritical("Penis");
+logger.LogCritical("Test");
 
 app.Run();
