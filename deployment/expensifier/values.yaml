@@ -8,6 +8,10 @@ cloudflare:
 
 alloy:
   alloy:
+    extraPorts:
+     - name: otel-grpc
+       port: 4317
+       targetPort: 4317
     configMap:
       content: |-
         prometheus.exporter.self "default" {
