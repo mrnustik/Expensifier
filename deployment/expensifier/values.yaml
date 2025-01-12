@@ -56,8 +56,10 @@ alloy:
           }
         }
 
-        otelcol.exporter.loki "default" {
-          forward_to = [loki.write.default.receiver]
+        otelcol.exporter.otlphttp "default" {
+          client {
+            endpoint = "http://monitoring-loki.monitoring.svc.cluster.local:3100/otlp"
+          }
         }
 
         tracing {
@@ -77,7 +79,7 @@ alloy:
         otelcol.processor.batch "example" {
           output {
             metrics = [otelcol.exporter.prometheus.default.input]
-            logs    = [otelcol.exporter.loki.default.input]
+            logs    = [otelcol.exporter.otlphttp.default.input]
             traces  = [otelcol.exporter.otlp.default.input]
           }
         }
