@@ -36,6 +36,10 @@ alloy:
           }
         }
 
+        otelcol.exporter.loki "default" {
+          forward_to = [loki.write.default.receiver]
+        }
+
         tracing {
           sampling_fraction = 0.1
           write_to          = [otelcol.exporter.otlp.default.input]
@@ -45,6 +49,18 @@ alloy:
             client {
                 endpoint = "monitoring-tempo.monitoring.svc.cluster.local:4317"
             }
+        }
+
+        otelcol.processor.batch "example" {
+          output {
+            metrics = [otelcol.exporter.prometheus.default.input]
+            logs    = [otelcol.exporter.loki.default.input]
+            traces  = [otelcol.exporter.otlp.default.input]
+          }
+        }
+
+        otelcol.exporter.prometheus "default" {
+          forward_to = [prometheus.remote_write.default.receiver]
         }
 
         otelcol.receiver.otlp "example" {
@@ -57,8 +73,8 @@ alloy:
           }
 
           output {
-            metrics = [otelcol.exporter.otlp.default.input]
-            logs    = [otelcol.exporter.otlp.default.input]
-            traces  = [otelcol.exporter.otlp.default.input]
+            metrics = [otelcol.processor.batch.example.input]
+            logs    = [otelcol.processor.batch.example.input]
+            traces  = [otelcol.processor.batch.example.input]
           }
         }
