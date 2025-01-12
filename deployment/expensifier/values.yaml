@@ -1,17 +1,15 @@
 backend:
-  version: v0.1.34
+  version: v0.1.36
 client:
   version: v0.1.25
 cloudflare:
   domain: expensifier.mrnustik.net
-
-
 alloy:
   alloy:
     extraPorts:
-     - name: otel-grpc
-       port: 4317
-       targetPort: 4317
+      - name: otel-grpc
+        port: 4317
+        targetPort: 4317
     configMap:
       content: |-
         prometheus.exporter.self "default" {
