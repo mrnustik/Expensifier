@@ -4,3 +4,61 @@ client:
   version: v0.1.25
 cloudflare:
   domain: expensifier.mrnustik.net
+
+
+alloy:
+  alloy:
+    configMap:
+      content: |-
+        prometheus.exporter.self "default" {
+        }
+
+        prometheus.scrape "metamonitoring" {
+          targets    = prometheus.exporter.self.default.targets
+          forward_to = [prometheus.remote_write.default.receiver]
+        }
+
+        prometheus.remote_write "default" {
+          endpoint {
+            url = "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9009/api/prom/push"
+          }
+        }
+
+        logging {
+          level    = "info"
+          format   = "json"
+          write_to = [loki.write.default.receiver]
+        }
+
+        loki.write "default" {
+          endpoint {
+            url = "http://monitoring-loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+          }
+        }
+
+        tracing {
+          sampling_fraction = 0.1
+          write_to          = [otelcol.exporter.otlp.default.input]
+        }
+
+        otelcol.exporter.otlp "default" {
+            client {
+                endpoint = "monitoring-tempo.monitoring.svc.cluster.local:4317"
+            }
+        }
+
+        otelcol.receiver.otlp "example" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+          }
+
+          http {
+            endpoint = "0.0.0.0:4318"
+          }
+
+          output {
+            metrics = [otelcol.exporter.otlp.default.input]
+            logs    = [otelcol.exporter.otlp.default.input]
+            traces  = [otelcol.exporter.otlp.default.input]
+          }
+        }
