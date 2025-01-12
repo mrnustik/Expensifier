@@ -20,7 +20,7 @@ alloy:
 
         prometheus.remote_write "default" {
           endpoint {
-            url = "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9009/api/v1/write"
+            url = "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
           }
         }
 
