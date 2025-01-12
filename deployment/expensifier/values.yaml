@@ -1,5 +1,5 @@
 backend:
-  version: v0.1.36
+  version: v0.1.37
 client:
   version: v0.1.25
 cloudflare:
