@@ -1,23 +1,43 @@
 using Expensifier.API.Accounts;
 using Expensifier.API.Common.Users;
-using Loki.Extensions.Logging;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Prometheus;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsProduction())
+var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
+
+if (tracingOtlpEndpoint != null)
 {
-    builder.Logging.AddLoki(options =>
-    {
-        options.IncludeScopes = true;
-        options.IncludePredefinedFields = true;
-        options.ApplicationName = "Expensifier";
-        options.MachineName = Environment.MachineName;
-    });
+    var openTelemetryBuilder = builder.Services.AddOpenTelemetry();
+
+    openTelemetryBuilder.ConfigureResource(r => r.AddService("expensifier-api"));
+
+    openTelemetryBuilder.WithMetrics(m =>
+                                         m.AddAspNetCoreInstrumentation()
+                                          .AddMeter("*")
+                                          .AddPrometheusExporter());
+    openTelemetryBuilder.WithTracing(t => t.AddAspNetCoreInstrumentation()
+                                           .AddOtlpExporter(e =>
+                                           {
+                                               e.Protocol = OtlpExportProtocol.Grpc;
+                                               e.Endpoint = new Uri(tracingOtlpEndpoint);
+                                           }));
+
+    builder.Logging.AddOpenTelemetry(o =>
+                                         o.AddOtlpExporter(e =>
+                                          {
+                                              e.Protocol = OtlpExportProtocol.Grpc;
+                                              e.Endpoint = new Uri(tracingOtlpEndpoint);
+                                          })
+                                          .IncludeScopes = true);
 }
 
 builder.Services.AddEndpointsApiExplorer();
@@ -49,21 +69,21 @@ builder.Services.AddMarten(options =>
 builder.Services
        .AddHealthChecks()
        .AddNpgSql(builder.Configuration.GetConnectionString("Postgres") ?? throw new InvalidOperationException());
-builder.Services
-       .UseHttpClientMetrics();
 
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();    
+    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+if(tracingOtlpEndpoint != null) 
+{
+    app.MapPrometheusScrapingEndpoint();
+}
 app.AddAccountEndpoints();
-app.UseMetricServer();
-app.UseHttpMetrics();
 app.MapHealthChecks("/api/health/full");
 app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 {
