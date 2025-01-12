@@ -22,6 +22,8 @@ if (tracingOtlpEndpoint != null)
 
     openTelemetryBuilder.WithMetrics(m =>
                                          m.AddAspNetCoreInstrumentation()
+                                          .AddRuntimeInstrumentation()
+                                          .AddProcessInstrumentation()
                                           .AddMeter("*")
                                           .AddPrometheusExporter());
     openTelemetryBuilder.WithTracing(t => t.AddAspNetCoreInstrumentation()
