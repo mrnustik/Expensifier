@@ -14,39 +14,49 @@ using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
+var oltpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
 
-if (tracingOtlpEndpoint != null)
+var openTelemetryBuilder = builder.Services.AddOpenTelemetry();
+
+openTelemetryBuilder.ConfigureResource(r => r.AddService("expensifier-api"));
+
+openTelemetryBuilder.WithMetrics(m =>
+                                     m.AddAspNetCoreInstrumentation()
+                                      .AddRuntimeInstrumentation()
+                                      .AddProcessInstrumentation()
+                                      .AddNpgsqlInstrumentation()
+                                      .AddMeter("Marten")
+                                      .AddMeter("*")
+                                      .AddPrometheusExporter());
+
+openTelemetryBuilder.WithTracing(t =>
 {
-    var openTelemetryBuilder = builder.Services.AddOpenTelemetry();
+    t.AddAspNetCoreInstrumentation()
+     .AddNpgsql()
+     .AddSource("Marten");
+    if (!string.IsNullOrEmpty(oltpEndpoint))
+    {
+        t.AddOtlpExporter(e =>
+        {
+            e.Protocol = OtlpExportProtocol.Grpc;
+            e.Endpoint = new Uri(oltpEndpoint);
+        });
+    }
+});
 
-    openTelemetryBuilder.ConfigureResource(r => r.AddService("expensifier-api"));
+builder.Logging.AddOpenTelemetry(o =>
+{
+    o.IncludeScopes = true;
 
-    openTelemetryBuilder.WithMetrics(m =>
-                                         m.AddAspNetCoreInstrumentation()
-                                          .AddRuntimeInstrumentation()
-                                          .AddProcessInstrumentation()
-                                          .AddNpgsqlInstrumentation()
-                                          .AddMeter("Marten")
-                                          .AddMeter("*")
-                                          .AddPrometheusExporter());
-    openTelemetryBuilder.WithTracing(t => t.AddAspNetCoreInstrumentation()
-                                           .AddNpgsql()
-                                           .AddSource("Marten")
-                                           .AddOtlpExporter(e =>
-                                           {
-                                               e.Protocol = OtlpExportProtocol.Grpc;
-                                               e.Endpoint = new Uri(tracingOtlpEndpoint);
-                                           }));
-
-    builder.Logging.AddOpenTelemetry(o =>
-                                         o.AddOtlpExporter(e =>
-                                          {
-                                              e.Protocol = OtlpExportProtocol.Grpc;
-                                              e.Endpoint = new Uri(tracingOtlpEndpoint);
-                                          })
-                                          .IncludeScopes = true);
-}
+    if (!string.IsNullOrEmpty(oltpEndpoint))
+    {
+        o.AddOtlpExporter(e =>
+        {
+            e.Protocol = OtlpExportProtocol.Grpc;
+            e.Endpoint = new Uri(oltpEndpoint);
+        });
+    }
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -89,19 +99,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-if(tracingOtlpEndpoint != null) 
-{
-    app.MapPrometheusScrapingEndpoint();
-}
+app.MapPrometheusScrapingEndpoint();
 app.AddAccountEndpoints();
 app.MapHealthChecks("/api/health/full");
 app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 {
     Predicate = _ => false
 });
-
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
-
-logger.LogCritical("Test");
 
 app.Run();
