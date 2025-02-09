@@ -40,7 +40,6 @@ metadata:
   labels:
     app: expensifier-api
 spec:
-  type: LoadBalancer
   selector:
     app: expensifier-api
   ports:

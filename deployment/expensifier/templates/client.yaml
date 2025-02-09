@@ -31,7 +31,6 @@ kind: Service
 metadata:
   name: expensifier-client-service
 spec:
-  type: LoadBalancer
   selector:
     app: expensifier-client
   ports:
