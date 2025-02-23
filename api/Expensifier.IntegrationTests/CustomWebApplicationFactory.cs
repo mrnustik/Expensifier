@@ -7,7 +7,8 @@ using Testcontainers.PostgreSql;
 
 namespace Expensifier.IntegrationTests;
 
-internal class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>,
+                                           IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
                                                      .WithImage("postgres:latest")
@@ -21,6 +22,16 @@ internal class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public Task StartAsync()
     {
         return _postgres.StartAsync();
+    }
+
+    public Task InitializeAsync()
+    {
+        return _postgres.StartAsync();
+    }
+
+    async Task IAsyncLifetime.DisposeAsync()
+    {
+        await DisposeAsync();
     }
 
     public override ValueTask DisposeAsync()

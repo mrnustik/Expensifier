@@ -1,4 +1,5 @@
 using Expensifier.API.Accounts;
+using Expensifier.API.Categories;
 using Expensifier.API.Common.Users;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
@@ -83,6 +84,7 @@ builder.Services.AddMarten(options =>
            options.OpenTelemetry.TrackConnections = TrackLevel.Verbose;
            options.OpenTelemetry.TrackEventCounters();
            options.ConfigureAccounts();
+           options.RegisterValueType(typeof(UserId));
        })
        .AddAsyncDaemon(DaemonMode.Solo);
 
@@ -100,6 +102,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapPrometheusScrapingEndpoint();
+app.MapCategoryEndpoints();
 app.AddAccountEndpoints();
 app.MapHealthChecks("/api/health/full");
 app.MapHealthChecks("/api/health/live", new HealthCheckOptions
@@ -108,3 +111,5 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 });
 
 app.Run();
+
+public partial class Program { }
