@@ -131,7 +131,7 @@ public class AccountsIntegrationTests : IAsyncLifetime
         body.Should()
             .ContainSingle(a =>
                                a.Name == "Account" &&
-                               a.Id == accountId.Value);
+                                 a.Id == accountId);
     }
 
     [Fact]
@@ -179,6 +179,6 @@ public class AccountsIntegrationTests : IAsyncLifetime
                 .Be(HttpStatusCode.OK);
         var body = await accounts.Content.ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>();
         body.Should()
-            .NotContain(a => a.Id == accountId.Value);
+            .NotContain(a => a.Id == accountId);
     }
 }

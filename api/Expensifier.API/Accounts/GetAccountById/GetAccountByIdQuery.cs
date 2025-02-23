@@ -20,7 +20,7 @@ public record GetAccountByIdQuery(AccountId AccountId)
                                                             CancellationToken cancellationToken)
         {
             return await _documentSession.Query<AccountDetail>()
-                                         .SingleOrDefaultAsync(a => a.Id == query.AccountId.Value, cancellationToken);
+                                         .SingleOrDefaultAsync(a => a.Id == query.AccountId, cancellationToken);
         }
     }
 }
