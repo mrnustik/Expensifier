@@ -5,13 +5,13 @@ namespace Expensifier.API.Accounts.GetAccounts;
 
 public record AccountListItem
 {
-    public Guid Id { get; set; }
+    public AccountId? Id { get; set; }
     public Guid UserId { get; set; }
     public string Name { get; set; }
 
     private void Apply(AccountCreated @event)
     {
-        Id = @event.Id.Value;
+        Id = @event.Id;
         Name = @event.Name;
         UserId = @event.UserId.Value;
     }

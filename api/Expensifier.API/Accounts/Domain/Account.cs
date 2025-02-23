@@ -10,13 +10,13 @@ public class Account
 
     public Account(AccountCreated @event)
     {
-        Id = @event.Id.Value;
+        Id = @event.Id;
         Name = @event.Name;
         UserId = @event.UserId;
         Balance = 0;
     }
 
-    public Guid Id { get; set; }
+    public AccountId Id { get; set; }
     public string Name { get; }
     public decimal Balance { get; }
     public UserId UserId { get; }
