@@ -24,7 +24,7 @@ public class CategoriesIntegrationTests
         // Act
         var response = await client.PostAsync(
             "/api/categories", 
-            JsonContent.Create(new CreateCategoryCommand("Test Category")),
+            JsonContent.Create(new CreateCategoryCommand("Test Category", CategoryType.Expense)),
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -39,9 +39,10 @@ public class CategoriesIntegrationTests
         // Arrange
         var client = _factory.CreateClient();
         var categoryName = $"Test Category {Guid.NewGuid()}";
+        var categoryType = CategoryType.Income;
         var createResponse = await client.PostAsync(
             "/api/categories",
-            JsonContent.Create(new CreateCategoryCommand(categoryName)),
+            JsonContent.Create(new CreateCategoryCommand(categoryName, categoryType)),
             TestContext.Current.CancellationToken);
         createResponse.EnsureSuccessStatusCode();
         var categoryId = await createResponse.Content.ReadFromJsonAsync<CategoryId>(TestContext.Current.CancellationToken);
@@ -58,7 +59,8 @@ public class CategoriesIntegrationTests
                                                      .ContainEquivalentOf(new
                                                      {
                                                          Id = categoryId,
-                                                         Name = categoryName
+                                                         Name = categoryName,
+                                                         Type = categoryType
                                                      }));
     }
 }

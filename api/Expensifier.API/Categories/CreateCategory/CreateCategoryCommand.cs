@@ -5,7 +5,8 @@ using Marten;
 namespace Expensifier.API.Categories.CreateCategory;
 
 public record CreateCategoryCommand(
-    string Name)
+    string Name,
+    CategoryType Type)
     : Command<CategoryId>
 {
     public class Handler : CommandHandler<CreateCategoryCommand, CategoryId>
@@ -26,6 +27,7 @@ public record CreateCategoryCommand(
             {
                 Id = CategoryId.New(),
                 Name = command.Name,
+                Type = command.Type,
                 UserId = _userProvider.CurrentUserId
             };
             _session.Store(category);
