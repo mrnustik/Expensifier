@@ -1,42 +1,22 @@
-﻿using JasperFx.Core.Reflection;
+﻿using Expensifier.API.Common.Users;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Testcontainers.PostgreSql;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Expensifier.IntegrationTests;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>,
-                                           IAsyncLifetime
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-                                                     .WithImage("postgres:latest")
-                                                     .Build();
+    private readonly TestInfrastructure _infrastructure;
+
+    public CustomWebApplicationFactory(TestInfrastructure infrastructure)
+    {
+        _infrastructure = infrastructure;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("ConnectionStrings:Postgres", _postgres.GetConnectionString());
-    }
-
-    public Task StartAsync()
-    {
-        return _postgres.StartAsync();
-    }
-
-    public Task InitializeAsync()
-    {
-        return _postgres.StartAsync();
-    }
-
-    async Task IAsyncLifetime.DisposeAsync()
-    {
-        await DisposeAsync();
-    }
-
-    public override ValueTask DisposeAsync()
-    {
-        base.DisposeAsync();
-        return _postgres.DisposeAsync();
+        builder.UseSetting("ConnectionStrings:Postgres", _infrastructure.PostgresConnectionString);
+        builder.ConfigureServices(services => services.AddSingleton<IUserProvider>(new TestUserProvider()));
     }
 }

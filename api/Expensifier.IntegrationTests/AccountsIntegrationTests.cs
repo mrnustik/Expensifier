@@ -11,13 +11,13 @@ using Testcontainers.PostgreSql;
 
 namespace Expensifier.IntegrationTests;
 
-public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+public class AccountsIntegrationTests 
 {
     private readonly CustomWebApplicationFactory _factory;
 
-    public AccountsIntegrationTests(CustomWebApplicationFactory factory)
+    public AccountsIntegrationTests(TestInfrastructure infrastructure)
     {
-        _factory = factory;
+        _factory = new CustomWebApplicationFactory(infrastructure);
     }
 
     [Fact]
@@ -29,7 +29,8 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         // Act
         var response = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
 
 
         // Assert
@@ -50,14 +51,15 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
         createdResponse.EnsureSuccessStatusCode();
         var location = createdResponse
                        .Headers
                        .Location;
 
         // Act
-        var getByIdResponse = await httpClient.GetAsync(location);
+        var getByIdResponse = await httpClient.GetAsync(location, TestContext.Current.CancellationToken);
 
         // Assert
         getByIdResponse.EnsureSuccessStatusCode();
@@ -65,7 +67,7 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
                        .Should()
                        .Be(HttpStatusCode.OK);
         var body = await getByIdResponse.Content
-                                        .ReadFromJsonAsync<AccountDetail>();
+                                        .ReadFromJsonAsync<AccountDetail>(TestContext.Current.CancellationToken);
         body.Name
             .Should()
             .Be("Account");
@@ -78,13 +80,14 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
         createdResponse.EnsureSuccessStatusCode();
         var accountId = await createdResponse.Content
-                                             .ReadFromJsonAsync<AccountId>();
+                                             .ReadFromJsonAsync<AccountId>(TestContext.Current.CancellationToken);
 
         // Act
-        var getByIdResponse = await httpClient.GetAsync($"api/accounts/{accountId}");
+        var getByIdResponse = await httpClient.GetAsync($"api/accounts/{accountId}", TestContext.Current.CancellationToken);
 
         // Assert
         getByIdResponse.EnsureSuccessStatusCode();
@@ -92,7 +95,7 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
                        .Should()
                        .Be(HttpStatusCode.OK);
         var body = await getByIdResponse.Content
-                                        .ReadFromJsonAsync<AccountDetail>();
+                                        .ReadFromJsonAsync<AccountDetail>(TestContext.Current.CancellationToken);
         body.Name
             .Should()
             .Be("Account");
@@ -108,13 +111,14 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
         createdResponse.EnsureSuccessStatusCode();
         var accountId = await createdResponse.Content
-                                             .ReadFromJsonAsync<AccountId>();
+                                             .ReadFromJsonAsync<AccountId>(TestContext.Current.CancellationToken);
 
         // Act
-        var getByIdResponse = await httpClient.GetAsync("api/accounts");
+        var getByIdResponse = await httpClient.GetAsync("api/accounts", TestContext.Current.CancellationToken);
 
         // Assert
         getByIdResponse.EnsureSuccessStatusCode();
@@ -122,7 +126,7 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
                        .Should()
                        .Be(HttpStatusCode.OK);
         var body = await getByIdResponse.Content
-                                        .ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>();
+                                        .ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>(TestContext.Current.CancellationToken);
         body.Should()
             .ContainSingle(a =>
                                a.Name == "Account" &&
@@ -136,12 +140,13 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
         createdResponse.EnsureSuccessStatusCode();
-        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>();
+        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>(TestContext.Current.CancellationToken);
         
         // Act
-        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}");
+        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}", TestContext.Current.CancellationToken);
         
         // Assert
         deleteResponse.EnsureSuccessStatusCode();
@@ -158,21 +163,22 @@ public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactor
         var httpClient = _factory.CreateClient();
         var createdResponse = await httpClient.PostAsync(
             "api/accounts/create",
-            JsonContent.Create(new CreateAccountCommand("Account")));
+            JsonContent.Create(new CreateAccountCommand("Account")),
+            TestContext.Current.CancellationToken);
         createdResponse.EnsureSuccessStatusCode();
-        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>();
-        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}");
+        var accountId = await createdResponse.Content.ReadFromJsonAsync<AccountId>(TestContext.Current.CancellationToken);
+        var deleteResponse = await httpClient.DeleteAsync($"api/accounts/{accountId}", TestContext.Current.CancellationToken);
         deleteResponse.EnsureSuccessStatusCode();
 
         // Act
-        var accounts = await httpClient.GetAsync("api/accounts");
+        var accounts = await httpClient.GetAsync("api/accounts", TestContext.Current.CancellationToken);
         
         // Assert
         accounts.EnsureSuccessStatusCode();
         accounts.StatusCode
                 .Should()
                 .Be(HttpStatusCode.OK);
-        var body = await accounts.Content.ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>();
+        var body = await accounts.Content.ReadFromJsonAsync<IReadOnlyCollection<AccountListItem>>(TestContext.Current.CancellationToken);
         body.Should()
             .NotContain(a => a.Id == accountId);
     }

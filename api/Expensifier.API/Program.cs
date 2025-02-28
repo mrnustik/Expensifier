@@ -75,12 +75,6 @@ builder.Services.AddMarten(options =>
 
            options.Connection(connectionString);
            options.UseSystemTextJsonForSerialization(configure: configure => { configure.IncludeFields = true; });
-
-           if (builder.Environment.IsDevelopment())
-           {
-               options.AutoCreateSchemaObjects = AutoCreate.All;
-           }
-
            options.OpenTelemetry.TrackConnections = TrackLevel.Verbose;
            options.OpenTelemetry.TrackEventCounters();
            options.ConfigureAccounts();

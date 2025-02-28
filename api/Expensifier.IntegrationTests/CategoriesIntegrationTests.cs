@@ -6,13 +6,13 @@ using FluentAssertions;
 
 namespace Expensifier.IntegrationTests;
 
-public class CategoriesIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+public class CategoriesIntegrationTests 
 {
     private readonly CustomWebApplicationFactory _factory;
 
-    public CategoriesIntegrationTests(CustomWebApplicationFactory factory)
+    public CategoriesIntegrationTests(TestInfrastructure infrastructure)
     {
-        _factory = factory;
+        _factory = new CustomWebApplicationFactory(infrastructure);
     }
 
     [Fact]
@@ -22,8 +22,10 @@ public class CategoriesIntegrationTests : IClassFixture<CustomWebApplicationFact
         var client = _factory.CreateClient();
 
         // Act
-        var response = await client.PostAsync("/api/categories",
-                                              JsonContent.Create(new CreateCategoryCommand("Test Category")));
+        var response = await client.PostAsync(
+            "/api/categories", 
+            JsonContent.Create(new CreateCategoryCommand("Test Category")),
+            TestContext.Current.CancellationToken);
 
         // Assert
         response
@@ -37,14 +39,15 @@ public class CategoriesIntegrationTests : IClassFixture<CustomWebApplicationFact
         // Arrange
         var client = _factory.CreateClient();
         var categoryName = $"Test Category {Guid.NewGuid()}";
-        var createResponse = await client.PostAsync("/api/categories",
-                                                    JsonContent.Create(
-                                                        new CreateCategoryCommand(categoryName)));
+        var createResponse = await client.PostAsync(
+            "/api/categories",
+            JsonContent.Create(new CreateCategoryCommand(categoryName)),
+            TestContext.Current.CancellationToken);
         createResponse.EnsureSuccessStatusCode();
-        var categoryId = await createResponse.Content.ReadFromJsonAsync<CategoryId>();
+        var categoryId = await createResponse.Content.ReadFromJsonAsync<CategoryId>(TestContext.Current.CancellationToken);
 
         // Act
-        var response = await client.GetAsync("/api/categories");
+        var response = await client.GetAsync("/api/categories", TestContext.Current.CancellationToken);
 
         // Assert
         response.Should()
