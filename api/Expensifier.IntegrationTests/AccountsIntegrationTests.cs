@@ -11,18 +11,13 @@ using Testcontainers.PostgreSql;
 
 namespace Expensifier.IntegrationTests;
 
-public class AccountsIntegrationTests : IAsyncLifetime
+public class AccountsIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly CustomWebApplicationFactory _factory = new();
+    private readonly CustomWebApplicationFactory _factory;
 
-    public Task InitializeAsync()
+    public AccountsIntegrationTests(CustomWebApplicationFactory factory)
     {
-        return _factory.StartAsync();
-    }
-
-    public Task DisposeAsync()
-    {
-        return _factory.DisposeAsync().AsTask();
+        _factory = factory;
     }
 
     [Fact]
